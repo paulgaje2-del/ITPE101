@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: soleva-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        value: https://soleva-storefront.onrender.com
+      - key: PAYMENT_PROVIDER
+        value: maya
+      - key: MAYA_ENVIRONMENT
+        value: sandbox
+      - key: MAYA_PUBLIC_KEY
+        sync: false
+      - key: MAYA_SECRET_KEY
+        sync: false
+      - key: MAYA_WEBHOOK_SECRET
+        sync: false
+
+  - type: web
+    name: soleva-storefront
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://soleva-api.onrender.com/api/v1

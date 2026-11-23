@@ -118,12 +118,14 @@ The project brief expects verified raw-body webhook signatures, payment amount/c
 
 ## Deployment topology
 
-- Frontend: Vercel or Netlify
-- API: Render or Railway
+- Frontend: Render Static Site (`soleva-storefront`)
+- API: Render Web Service (`soleva-api`)
 - Database: Supabase PostgreSQL
 - Payment: Maya Sandbox webhook to deployed HTTPS API
 
-Set `VITE_API_URL` to the deployed API's `/api/v1` URL and configure all backend environment variables in the hosting provider dashboard. Never upload `.env` files.
+The repository includes a Render Blueprint in `render.yaml`. Push it to GitHub, then in Render choose **New → Blueprint**, select this repository, and apply the Blueprint. Enter the Supabase session-pooler URI and Maya sandbox credentials when prompted. The Blueprint uses the default service domains `soleva-api.onrender.com` and `soleva-storefront.onrender.com`; update `CLIENT_URL` and `VITE_API_URL` in Render if those names are unavailable. After deployment, run `npm run seed` against the production `DATABASE_URL` only if you intend to initialize the demo catalog. Configure Maya's webhook URL as `https://soleva-api.onrender.com/api/v1/payments/webhook`.
+
+Never upload `.env` files or put database/payment secrets in the frontend.
 
 ## Current verification status
 
