@@ -1,0 +1,2 @@
+export function notFound(req,res){res.status(404).json({success:false,error:{code:'NOT_FOUND',message:'The requested resource was not found.'},requestId:req.id});}
+export function errors(err,req,res,next){const status=err.status|| (err.name==='ValidationError'?422:err.code==='23505'?409:500);res.status(status).json({success:false,error:{code:status===500?'INTERNAL_ERROR':(err.code||'REQUEST_ERROR'),message:status===500?'An unexpected error occurred.':err.message},requestId:req.id});}

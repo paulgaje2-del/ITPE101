@@ -1,0 +1,3 @@
+import jwt from 'jsonwebtoken';
+export function auth(req,res,next){try{const token=(req.headers.authorization||'').replace(/^Bearer\s+/,'');if(!token) return res.status(401).json({success:false,error:{code:'UNAUTHENTICATED',message:'Sign in to continue.'}});req.user=jwt.verify(token,process.env.JWT_SECRET);next();}catch{return res.status(401).json({success:false,error:{code:'INVALID_TOKEN',message:'Your session is invalid or expired.'}});}}
+export const admin=(req,res,next)=>req.user?.role==='admin'?next():res.status(403).json({success:false,error:{code:'FORBIDDEN',message:'Administrator access required.'}});

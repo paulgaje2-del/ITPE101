@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: base payment provider rejects an unimplemented checkout operation
+ok 1 - base payment provider rejects an unimplemented checkout operation
+  ---
+  duration_ms: 1.195731
+  type: 'test'
+  ...
+# Subtest: base payment provider rejects an unimplemented verification operation
+ok 2 - base payment provider rejects an unimplemented verification operation
+  ---
+  duration_ms: 0.830551
+  type: 'test'
+  ...
+# Subtest: factory creates PayMongo adapter by default
+ok 3 - factory creates PayMongo adapter by default
+  ---
+  duration_ms: 0.167212
+  type: 'test'
+  ...
+# Subtest: factory creates PayMongo adapter when selected
+ok 4 - factory creates PayMongo adapter when selected
+  ---
+  duration_ms: 0.08637
+  type: 'test'
+  ...
+# Subtest: factory creates Maya adapter when selected
+ok 5 - factory creates Maya adapter when selected
+  ---
+  duration_ms: 0.127883
+  type: 'test'
+  ...
+# Subtest: factory rejects unknown providers
+ok 6 - factory rejects unknown providers
+  ---
+  duration_ms: 0.1395
+  type: 'test'
+  ...
+# Subtest: Maya extension point fails clearly instead of simulating payment
+ok 7 - Maya extension point fails clearly instead of simulating payment
+  ---
+  duration_ms: 0.133622
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 55.100319

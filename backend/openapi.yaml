@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: SOLEVA Shoe Store API
+  version: 1.0.0
+  description: Versioned REST API for the SOLEVA shoe e-commerce capstone.
+servers:
+  - url: http://localhost:5000/api/v1
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+  schemas:
+    Error:
+      type: object
+      properties:
+        success: {type: boolean, example: false}
+        error:
+          type: object
+          properties:
+            code: {type: string}
+            message: {type: string}
+    Product:
+      type: object
+      properties:
+        _id: {type: string}
+        name: {type: string}
+        category: {type: string}
+        description: {type: string}
+        price: {type: number, example: 2890}
+        image: {type: string}
+        sizes: {type: array, items: {type: integer}}
+        stock: {type: integer}
+paths:
+  /auth/register:
+    post:
+      summary: Register a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [name,email,password], properties: {name: {type: string}, email: {type: string, format: email}, password: {type: string, minLength: 8}}}
+      responses:
+        '201': {description: Customer registered}
+        '409': {description: Email already exists}
+        '422': {description: Invalid registration data}
+  /auth/login:
+    post:
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [email,password], properties: {email: {type: string}, password: {type: string}}}
+      responses:
+        '200': {description: JWT and user}
+        '401': {description: Invalid credentials}
+  /products:
+    get:
+      summary: Browse and filter shoes
+      parameters:
+        - {in: query, name: q, schema: {type: string}}
+        - {in: query, name: category, schema: {type: string}}
+        - {in: query, name: sort, schema: {type: string, enum: [newest,price-low,price-high]}}
+        - {in: query, name: page, schema: {type: integer, minimum: 1}}
+        - {in: query, name: limit, schema: {type: integer, minimum: 1, maximum: 48}}
+      responses:
+        '200': {description: Product list and pagination metadata}
+  /products/{id}:
+    get:
+      summary: Get shoe details
+      parameters: [{in: path, name: id, required: true, schema: {type: string}}]
+      responses:
+        '200': {description: Product detail}
+        '404': {description: Product not found}
+  /ai/shoe-finder:
+    post:
+      summary: Find shoes using natural language and live catalog data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [query], properties: {query: {type: string, maxLength: 240}}}
+      responses:
+        '200': {description: Validated catalog recommendations}
+        '422': {description: Invalid query}
+        '429': {description: Rate limit exceeded}
+  /checkout:
+    post:
+      security: [{bearerAuth: []}]
+      summary: Create order and Maya hosted checkout session
+      parameters: [{in: header, name: Idempotency-Key, required: true, schema: {type: string}}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [items,shipping], properties: {items: {type: array, items: {type: object, required: [productId,size,quantity], properties: {productId: {type: string}, size: {type: integer}, quantity: {type: integer}}}}, coupon: {type: string}, shipping: {type: object}}}
+      responses:
+        '201': {description: Pending order and hosted payment URL}
+        '401': {description: Authentication required}
+        '409': {description: Stock conflict}
+        '422': {description: Invalid checkout}
+  /orders/me:
+    get:
+      security: [{bearerAuth: []}]
+      summary: List signed-in customer's orders
+      responses:
+        '200': {description: Customer orders}
+        '401': {description: Authentication required}
+  /admin/dashboard:
+    get:
+      security: [{bearerAuth: []}]
+      summary: Admin sales and low-stock summary
+      responses:
+        '200': {description: Dashboard summary}
+        '403': {description: Administrator role required}
+  /admin/products:
+    post:
+      security: [{bearerAuth: []}]
+      summary: Create shoe product
+      responses:
+        '201': {description: Product created}
+        '403': {description: Administrator role required}
+  /admin/products/{id}:
+    patch:
+      security: [{bearerAuth: []}]
+      summary: Update shoe product
+      parameters: [{in: path, name: id, required: true, schema: {type: string}}]
+      responses:
+        '200': {description: Product updated}
+    delete:
+      security: [{bearerAuth: []}]
+      summary: Deactivate shoe product
+      parameters: [{in: path, name: id, required: true, schema: {type: string}}]
+      responses:
+        '200': {description: Product deactivated}
+  /admin/orders:
+    get:
+      security: [{bearerAuth: []}]
+      summary: List all orders for administrators
+      responses:
+        '200': {description: Orders}
+        '403': {description: Administrator role required}
+  /admin/orders/{id}/status:
+    patch:
+      security: [{bearerAuth: []}]
+      summary: Move order through allowed lifecycle
+      parameters: [{in: path, name: id, required: true, schema: {type: string}}]
+      responses:
+        '200': {description: Status updated}
+        '409': {description: Invalid order transition}
+  /admin/coupons:
+    post:
+      security: [{bearerAuth: []}]
+      summary: Create coupon
+      responses:
+        '201': {description: Coupon created}
+        '403': {description: Administrator role required}
