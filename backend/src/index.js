@@ -1,5 +1,9 @@
-import 'dotenv/config';import app from './app.js';import {initializeDatabase,closeDatabase} from './db.js';
-const port=process.env.PORT||5000;
+import app from './app.js';
+import {env,validateEnvironment} from './config/env.js';
+import {initializeDatabase,closeDatabase} from './config/database.js';
+
+validateEnvironment();
+const port=env.port;
 try{
  await initializeDatabase();
  const server=app.listen(port,()=>console.log(`SOLEVA API listening on ${port}`));

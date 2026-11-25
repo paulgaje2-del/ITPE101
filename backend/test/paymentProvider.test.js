@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PaymentProvider,PayMongoProvider,MayaProvider,PaymentProviderFactory} from '../src/services/paymentProvider.js';
+import {PaymentProvider,PayMongoProvider,MayaProvider,PaymentProviderFactory} from '../src/patterns/payment/payment-provider.js';
 
 test('base payment provider rejects an unimplemented checkout operation',async()=>{await assert.rejects(()=>new PaymentProvider().createCheckout(),/must be implemented/)});
 test('base payment provider rejects an unimplemented verification operation',async()=>{await assert.rejects(()=>new PaymentProvider().verifyPayment(),/must be implemented/)});

@@ -1,4 +1,4 @@
-import {query,withTransaction} from '../db.js';
+import {query,withTransaction} from '../config/database.js';
 
 const productColumns=`id AS "_id",name,slug,brand,category,description,price,image,sizes,colors,stock,featured,active,material,sport,created_at AS "createdAt",updated_at AS "updatedAt"`;
 const orderColumns=`id AS "_id",user_id AS "user",items,shipping,subtotal,discount,shipping_fee AS "shippingFee",total,coupon_code AS "couponCode",status,payment_reference AS "paymentReference",payment_url AS "paymentUrl",idempotency_key AS "idempotencyKey",payment_mismatch AS "paymentMismatch",status_history AS "statusHistory",created_at AS "createdAt",updated_at AS "updatedAt"`;

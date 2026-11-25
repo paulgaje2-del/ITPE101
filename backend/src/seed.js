@@ -1,4 +1,4 @@
-import 'dotenv/config';import bcrypt from 'bcryptjs';import {query,initializeDatabase,closeDatabase} from './db.js';import {createProduct} from './models/index.js';
+import 'dotenv/config';import bcrypt from 'bcryptjs';import {query,initializeDatabase,closeDatabase} from './config/database.js';import {createProduct} from './models/index.js';
 const shoes=[
 ['AeroFlex Runner','Running','Lightweight everyday running shoe with breathable mesh and cushioned support.',2890,'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900',28,[7,8,9,10,11],true],
 ['Court Classic Low','Lifestyle','A clean low-top silhouette for daily wear and weekend styling.',2490,'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=900',19,[7,8,9,10],true],

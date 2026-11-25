@@ -8,7 +8,7 @@ import {
  recordPaymentMismatch,updateOrderStatus,updatePaymentSession,updateProduct as updateProductRecord
 } from '../models/index.js';
 import {createOrder} from '../services/orderService.js';
-import {PaymentProviderFactory} from '../services/paymentProvider.js';
+import {PaymentProviderFactory} from '../patterns/payment/payment-provider.js';
 import {ShoeDiscoveryService} from '../services/aiService.js';
 
 const ok=(res,data,status=200,meta)=>res.status(status).json({success:true,data,...(meta?{meta}:{})});
