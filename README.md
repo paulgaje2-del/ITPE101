@@ -15,7 +15,7 @@ SOLEVA is a shoe-focused e-commerce application prepared for the ITPE101 final p
 
 ## Technology
 
-- Frontend: React 18 + Vite
+- Client: React 18 + Vite (`client/`)
 - Backend: Node.js + Express, REST API under `/api/v1`
 - Database: Supabase PostgreSQL via `pg`
 - Authentication: bcrypt password hashing + 2-hour JWT + role middleware
@@ -34,7 +34,7 @@ SOLEVA is a shoe-focused e-commerce application prepared for the ITPE101 final p
 
 1. Install Node.js and create a Supabase project.
 2. Copy `backend/.env.example` to `backend/.env` and fill in the values.
-3. Copy `frontend/.env.example` to `frontend/.env`.
+3. Copy `client/.env.example` to `client/.env`.
 4. Set `DATABASE_URL` in `backend/.env` to the PostgreSQL connection string from Supabase **Connect → Session pooler**. Keep it secret; the backend creates tables from `backend/schema.sql` on startup.
 5. From the project root, run:
 
@@ -51,40 +51,8 @@ If you prefer separate terminals:
 
 ```bash
 cd backend && npm install && npm run seed && npm run dev
-cd frontend && npm install && npm run dev
+cd client && npm install && npm run dev
 ```
-
-## Install SOLEVA from a mobile browser (PWA)
-
-The website can be installed from a supported mobile browser and launched in a standalone app window. Deploy the site over HTTPS first. On Android, open the site in Chrome and choose **Install app** (or **Add to Home screen**) from the browser menu. On iPhone, open it in Safari, tap **Share**, then **Add to Home Screen**. The web app shell can open offline after it has loaded once, but browsing products, signing in, AI suggestions, and checkout still require the API and an internet connection.
-
-## Android and iOS native app
-
-The storefront can also be packaged as a native Android/iOS application using Capacitor. It reuses the React storefront and the same Express API; it is not a separate React Native implementation.
-
-1. Deploy the API over HTTPS (or use a reachable HTTPS development tunnel) and set `VITE_API_URL` in `frontend/.env` to the API's `/api/v1` URL. Do not use `localhost` on a physical phone: that points to the phone itself.
-2. From `frontend/`, install dependencies and create the native projects:
-
-```powershell
-npm install
-npx cap add android
-npx cap add ios
-npm run mobile:sync
-```
-
-3. Open Android Studio on Windows or macOS with the Android SDK and a JDK installed:
-
-```powershell
-npx cap open android
-```
-
-4. Open the iOS project on a Mac with Xcode installed:
-
-```bash
-npx cap open ios
-```
-
-Whenever web code or `VITE_API_URL` changes, run `npm run mobile:sync` to rebuild the storefront and copy it into the native projects. The backend CORS configuration allows the Capacitor Android and iOS WebView origins. iOS builds and signing require macOS and Xcode; this cannot be completed on Windows.
 
 ## Seed accounts and coupons
 
@@ -132,17 +100,27 @@ Never use live keys or real customer payment details for this coursework project
 
 ## AI setup
 
-Set `GEMINI_API_KEY` in `backend/.env`. The frontend calls only `/ai/shoe-finder`; the provider key must never be placed in `frontend/.env`, frontend code, screenshots, or Git. AI output is constrained to product IDs retrieved from the catalog. If the provider is unavailable, a catalog fallback is returned.
+Set `GEMINI_API_KEY` in `backend/.env`. The client calls only `/ai/shoe-finder`; the provider key must never be placed in `client/.env`, client code, screenshots, or Git. AI output is constrained to product IDs retrieved from the catalog. If the provider is unavailable, a catalog fallback is returned.
 
 ## Design patterns and OOP map
 
-- **MVC / layered architecture:** `routes/api.js` → `controllers/controllers.js` → services → PostgreSQL repository.
+- **MVC / layered architecture:** domain routes → controllers → services → repositories/models, with request validation in validators and middleware.
 - **Factory Method:** `PaymentProviderFactory` selects a concrete payment adapter.
 - **Inheritance and polymorphism:** abstract-like `PaymentProvider` base class with `PayMongoProvider` and `MayaProvider` subclasses.
 - **Proxy:** `ShoeDiscoveryService` wraps Gemini calls, retrieval, validation, and fallback behavior.
 - **Composition:** checkout logic composes product, coupon, order, and payment services rather than using deep inheritance.
 
 Maya is the selected provider for this project. The PayMongo adapter remains available as an explicit alternative provider.
+
+## Automated tests
+
+Run the backend unit and HTTP API contract tests from the project root:
+
+```bash
+npm test
+```
+
+The HTTP tests cover health responses, request validation, authentication, authorization, and webhook signature rejection. They deliberately avoid a live database. These are HTTP-level tests, not database-backed integration tests; configure a separate test database before claiming the database workflows have been verified.
 
 ## Important implementation checks before defense
 
@@ -157,11 +135,11 @@ The project brief expects verified raw-body webhook signatures, payment amount/c
 
 The repository includes a Render Blueprint in `render.yaml`. Push it to GitHub, then in Render choose **New → Blueprint**, select this repository, and apply the Blueprint. Enter the Supabase session-pooler URI and Maya sandbox credentials when prompted. The Blueprint uses the default service domains `soleva-api.onrender.com` and `soleva-storefront.onrender.com`; update `CLIENT_URL` and `VITE_API_URL` in Render if those names are unavailable. After deployment, run `npm run seed` against the production `DATABASE_URL` only if you intend to initialize the demo catalog. Configure Maya's webhook URL as `https://soleva-api.onrender.com/api/v1/payments/webhook`.
 
-Never upload `.env` files or put database/payment secrets in the frontend.
+Never upload `.env` files or put database/payment secrets in the client.
 
 ## Current verification status
 
-The frontend JSX and backend JavaScript syntax have been checked. The Node.js unit tests cover the payment-provider abstraction/factory. These are **not** the six required HTTP integration tests. Configure a Supabase `DATABASE_URL`, apply the SQL schema, and run the database-backed workflows before claiming the migration or Maya sandbox webhook integration is verified. Stock release/reconciliation for failed or expired payments, server-persistent cart endpoints, coupon per-customer usage enforcement, and a full admin workflow test remain outstanding. Deployment has not been performed. See the checklist before submitting or defending.
+The backend test suite currently passes 19 unit and HTTP contract tests. These tests are **not** the six required database-backed integration tests. Configure a separate Supabase `DATABASE_URL`, apply the SQL schema, and exercise the database workflows before claiming the migration or Maya sandbox webhook integration is verified. Stock release/reconciliation for failed or expired payments, server-persistent cart endpoints, coupon per-customer usage enforcement, and a full admin workflow test remain outstanding. Deployment has not been performed. See the checklist before submitting or defending.
 #   F I N A L P R O J  
  #   F I N A L P R O J  
  

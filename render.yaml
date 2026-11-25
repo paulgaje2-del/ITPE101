@@ -31,7 +31,7 @@ services:
   - type: web
     name: soleva-storefront
     runtime: static
-    rootDir: frontend
+    rootDir: client
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
     envVars:

@@ -1,9 +1,0 @@
-{
-  "appId": "com.soleva.store",
-  "appName": "SOLEVA",
-  "webDir": "dist",
-  "server": {
-    "androidScheme": "https",
-    "iosScheme": "capacitor"
-  }
-}

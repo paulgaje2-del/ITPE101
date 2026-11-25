@@ -1,0 +1,5 @@
+import {useEffect,useState} from 'react';
+import {API} from '../api.js';
+import {formatMoney} from '../data/format.js';
+function OrdersPanel({token}){const[orders,setOrders]=useState([]),[error,setError]=useState('');useEffect(()=>{fetch(`${API}/orders/me`,{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.json()).then(d=>{if(d.success)setOrders(d.data);else setError(d.error?.message||'Unable to load orders')}).catch(()=>setError('Connect the API to view order history.'))},[]);return <section className="admin-page"><p className="eyebrow">YOUR SOLEVA ACCOUNT</p><h2 className="orders-title">Order <em>history.</em></h2>{error&&<p className="admin-message">{error}</p>}{orders.map(o=><div className="history-card" key={o._id}><div><b>Order #{o._id.slice(-7).toUpperCase()}</b><span>{new Date(o.createdAt).toLocaleDateString()}</span></div><strong>{formatMoney(o.total)}</strong><em>{o.status.replace('_',' ')}</em></div>)}{!orders.length&&!error&&<p className="muted">Your orders will appear here after checkout.</p>}</section>}
+export default OrdersPanel;

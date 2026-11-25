@@ -31,14 +31,31 @@ export class MayaProvider extends PaymentProvider {
   const publicKey=process.env.MAYA_PUBLIC_KEY;
   const secretKey=process.env.MAYA_SECRET_KEY;
   if(!publicKey||!secretKey) throw Object.assign(new Error('Maya sandbox keys are not configured'),{status:503});
-  const auth=Buffer.from(`${publicKey}:${secretKey}`).toString('base64');
+  const auth=Buffer.from(`${publicKey}:`).toString('base64');
   const buyerName=order.shipping?.name||order.user?.name||'SOLEVA Customer';
   const nameParts=buyerName.trim().split(/\s+/);
-  const amount=Number(order.total).toFixed(2);
+  const amount=Number(Number(order.total).toFixed(2));
   const body={
-   totalAmount:{amount,currency:'PHP',details:{subtotal:Number(order.subtotal).toFixed(2),shippingFee:Number(order.shippingFee||0).toFixed(2),tax:'0.00',discount:Number(order.discount||0).toFixed(2)}},
+   totalAmount:{
+    value:amount,
+    currency:'PHP',
+    details:{
+     subtotal:Number(order.subtotal),
+     shippingFee:Number(order.shippingFee||0),
+     tax:0,
+     discount:Number(order.discount||0),
+     serviceCharge:0
+    }
+   },
    buyer:{firstName:nameParts[0]||'SOLEVA',lastName:nameParts.slice(1).join(' ')||'Customer',contact:{phone:order.shipping?.phone||'09170000000',email:order.user?.email||'customer@soleva.test'}},
-   items:(order.items||[]).map(item=>({name:item.name,quantity:String(item.quantity),code:String(item.product),description:`SOLEVA size ${item.size}`,amount:Number(item.unitPrice).toFixed(2),totalAmount:Number(item.unitPrice*item.quantity).toFixed(2)})),
+   items:(order.items||[]).map(item=>({
+    name:item.name,
+    quantity:Number(item.quantity),
+    code:String(item.product),
+    description:`SOLEVA size ${item.size}`,
+    amount:{value:Number(item.unitPrice)},
+    totalAmount:{value:Number((item.unitPrice*item.quantity).toFixed(2))}
+   })),
    redirectUrl:{success:`${process.env.CLIENT_URL}/orders?payment=success`,failure:`${process.env.CLIENT_URL}/cart?payment=failed`,cancel:`${process.env.CLIENT_URL}/cart?payment=cancelled`},
    requestReferenceNumber:String(order._id)
   };
@@ -51,13 +68,24 @@ export class MayaProvider extends PaymentProvider {
   const publicKey=process.env.MAYA_PUBLIC_KEY;
   const secretKey=process.env.MAYA_SECRET_KEY;
   if(!reference||!publicKey||!secretKey)return false;
-  const auth=Buffer.from(`${publicKey}:${secretKey}`).toString('base64');
+  const auth=Buffer.from(`${secretKey}:`).toString('base64');
   const res=await fetch(`${this.getBaseUrl()}/checkout/v1/checkouts/${reference}`,{headers:{Authorization:`Basic ${auth}`}});
   if(!res.ok)return false;
   const data=await res.json();
   const paymentStatus=data.paymentStatus||data.status||data.checkoutStatus;
-  const amount=Number(data.totalAmount?.amount ?? data.amount ?? 0);
-  return {paid:String(paymentStatus).toUpperCase()==='PAYMENT_SUCCESS'||String(paymentStatus).toUpperCase()==='COMPLETED',amount:Math.round(amount*100),currency:String(data.totalAmount?.currency||data.currency||'PHP').toUpperCase()};
+  const paymentAmount=data.paymentDetails?.responses?.efs?.amount?.total;
+  const amount=Number(
+   data.totalAmount?.value ??
+   paymentAmount?.value ??
+   data.amount?.value ??
+   data.amount ??
+   0
+  );
+  return {
+   paid:String(paymentStatus).toUpperCase()==='PAYMENT_SUCCESS'||String(paymentStatus).toUpperCase()==='COMPLETED',
+   amount:Math.round(amount*100),
+   currency:String(data.totalAmount?.currency||paymentAmount?.currency||data.currency||'PHP').toUpperCase()
+  };
  }
  verifyWebhook(rawBody,signature){
   const secret=process.env.MAYA_WEBHOOK_SECRET;

@@ -10,7 +10,7 @@
       "request": {
         "method": "GET",
         "header": [],
-        "url": "{{baseUrl}}/../api/health",
+        "url": "{{apiHost}}/api/health",
         "description": "Run against a local or deployed SOLEVA test environment."
       },
       "response": []

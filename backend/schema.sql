@@ -68,6 +68,24 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS orders_user_created_idx ON orders (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS orders_status_idx ON orders (status);
 
+CREATE TABLE IF NOT EXISTS coupon_redemptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  coupon_code text NOT NULL REFERENCES coupons(code) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES users(id),
+  order_id uuid NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+  redeemed_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS coupon_redemptions_customer_idx
+  ON coupon_redemptions (coupon_code, user_id);
+
+INSERT INTO coupon_redemptions(coupon_code,user_id,order_id,redeemed_at)
+SELECT o.coupon_code,o.user_id,o.id,o.created_at
+FROM orders o
+JOIN coupons c ON c.code=o.coupon_code
+WHERE o.coupon_code IS NOT NULL
+ON CONFLICT (order_id) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS webhook_events (
   event_id text PRIMARY KEY,
   type text,

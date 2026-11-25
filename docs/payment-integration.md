@@ -23,6 +23,8 @@ Never place Maya keys in the React frontend or in repository files.
 5. Maya redirects the browser to the configured success, failure, or cancel URL.
 6. Browser redirects are informational only.
 
+Create Checkout uses the Maya public key as the Basic Auth username with an empty password. Payment verification uses the secret key the same way. The request represents each monetary amount with a `value` (and `currency: "PHP"` for the checkout total). Item `amount` is the unit price; item `totalAmount` is the quantity-adjusted line total. Keep these fields in the Maya money-object format rather than sending flat formatted strings.
+
 ## Webhook and verification
 
 The public endpoint is `POST /api/v1/payments/webhook`. It requires the raw JSON request body and the Maya signature header. The selected header and exact signature format must be verified against the Maya sandbox account configuration.
