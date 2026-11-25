@@ -25,7 +25,7 @@ SOLEVA is a shoe-focused e-commerce application prepared for the ITPE101 final p
 
 ## Requirements
 
-- Node.js 20 or later
+- Node.js 20.19 or later
 - Supabase project with PostgreSQL connection string
 - Maya sandbox public/secret keys and webhook secret for real sandbox checkout
 - Gemini API key for live AI recommendations
@@ -53,6 +53,38 @@ If you prefer separate terminals:
 cd backend && npm install && npm run seed && npm run dev
 cd frontend && npm install && npm run dev
 ```
+
+## Install SOLEVA from a mobile browser (PWA)
+
+The website can be installed from a supported mobile browser and launched in a standalone app window. Deploy the site over HTTPS first. On Android, open the site in Chrome and choose **Install app** (or **Add to Home screen**) from the browser menu. On iPhone, open it in Safari, tap **Share**, then **Add to Home Screen**. The web app shell can open offline after it has loaded once, but browsing products, signing in, AI suggestions, and checkout still require the API and an internet connection.
+
+## Android and iOS native app
+
+The storefront can also be packaged as a native Android/iOS application using Capacitor. It reuses the React storefront and the same Express API; it is not a separate React Native implementation.
+
+1. Deploy the API over HTTPS (or use a reachable HTTPS development tunnel) and set `VITE_API_URL` in `frontend/.env` to the API's `/api/v1` URL. Do not use `localhost` on a physical phone: that points to the phone itself.
+2. From `frontend/`, install dependencies and create the native projects:
+
+```powershell
+npm install
+npx cap add android
+npx cap add ios
+npm run mobile:sync
+```
+
+3. Open Android Studio on Windows or macOS with the Android SDK and a JDK installed:
+
+```powershell
+npx cap open android
+```
+
+4. Open the iOS project on a Mac with Xcode installed:
+
+```bash
+npx cap open ios
+```
+
+Whenever web code or `VITE_API_URL` changes, run `npm run mobile:sync` to rebuild the storefront and copy it into the native projects. The backend CORS configuration allows the Capacitor Android and iOS WebView origins. iOS builds and signing require macOS and Xcode; this cannot be completed on Windows.
 
 ## Seed accounts and coupons
 
@@ -130,3 +162,6 @@ Never upload `.env` files or put database/payment secrets in the frontend.
 ## Current verification status
 
 The frontend JSX and backend JavaScript syntax have been checked. The Node.js unit tests cover the payment-provider abstraction/factory. These are **not** the six required HTTP integration tests. Configure a Supabase `DATABASE_URL`, apply the SQL schema, and run the database-backed workflows before claiming the migration or Maya sandbox webhook integration is verified. Stock release/reconciliation for failed or expired payments, server-persistent cart endpoints, coupon per-customer usage enforcement, and a full admin workflow test remain outstanding. Deployment has not been performed. See the checklist before submitting or defending.
+#   F I N A L P R O J  
+ #   F I N A L P R O J  
+ 

@@ -18,7 +18,13 @@ import {notFound,errors} from './middleware/errors.js';
 const app=express();
 app.set('trust proxy',1);
 app.use(helmet());
-app.use(cors({origin:env.clientUrl,credentials:true}));
+app.use(cors({
+ origin(origin,callback){
+  if(!origin||env.clientOrigins.includes(origin))return callback(null,true);
+  return callback(new Error('Origin is not allowed by CORS.'));
+ },
+ credentials:true
+}));
 app.use(morgan('dev'));
 app.post('/api/v1/payments/webhook',express.raw({type:'application/json'}),(req,res,next)=>{
  req.rawBody=req.body;

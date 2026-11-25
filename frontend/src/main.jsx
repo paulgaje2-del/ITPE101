@@ -1,4 +1,4 @@
-import React,{useEffect,useMemo,useState} from 'react';import{createRoot}from'react-dom/client';import{Search,ShoppingBag,ArrowUpRight,ArrowRight,Menu,X,SlidersHorizontal,Sparkles,Heart,User,ChevronDown,Plus,Minus,Trash2,PackageCheck,Instagram,Facebook}from'lucide-react';import'./style.css';
+import React,{useEffect,useMemo,useState} from 'react';import{createRoot}from'react-dom/client';import{Search,ShoppingBag,ArrowUpRight,ArrowRight,Menu,X,SlidersHorizontal,Sparkles,Heart,User,ChevronDown,Plus,Minus,Trash2,PackageCheck,Instagram,Facebook}from'lucide-react';import'./style.css';import'./pwa.js';
 const API=import.meta.env.VITE_API_URL||'http://localhost:5000/api/v1';
 const demo=[
 {id:'1',name:'AeroFlex Runner',category:'Running',description:'Lightweight everyday running shoe with breathable mesh and cushioned support.',price:2890,image:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900',stock:28,sizes:[7,8,9,10,11],featured:true},

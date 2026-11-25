@@ -10,5 +10,10 @@ export function validateEnvironment(){
 export const env={
  port:Number(process.env.PORT||5000),
  clientUrl:process.env.CLIENT_URL||'http://localhost:5173',
+ clientOrigins:[
+  process.env.CLIENT_URL||'http://localhost:5173',
+  'https://localhost',
+  'capacitor://localhost'
+ ],
  paymentProvider:process.env.PAYMENT_PROVIDER||'maya'
 };
